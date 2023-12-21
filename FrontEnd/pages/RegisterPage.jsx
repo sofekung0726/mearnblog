@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Navigate, redirect } from 'react-router-dom'
 const baseURL = import.meta.env.VITE_BASE_URL
 const RegisterPage = () => {
   const [username, setUsername] = useState("")
@@ -12,11 +13,13 @@ const RegisterPage = () => {
     })
     if (response.status === 200) {
       alert("Register Successful")
+      return <Navigate to={"/login"} />
     }
     else (
       alert("Register  Failed")
     )
   }
+  
   return (
     <form className='register' onSubmit={register}>
       <h1>
