@@ -150,3 +150,32 @@ form.login h1, form.register h1 {
     text-align: center;
     
 }
+
+div.edit-row{
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+div.post-page a.edit-btn{
+    background-color: #333;
+    display: inline;
+    align-items: center;
+    gap: 5px;
+    color: #fff;
+    padding: 15px 30px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+div.post-page a.delete-btn{
+    background-color: #ff0000;
+    display: inline;
+    align-items: center;
+    gap: 5px;
+    color: #fff;
+    padding: 15px 30px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+a svg {
+    height: 20px;
+}

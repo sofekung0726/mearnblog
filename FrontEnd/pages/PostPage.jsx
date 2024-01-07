@@ -1,24 +1,114 @@
-import React from 'react'
+import {useContext, useEffect, useState} from 'react'
+import { useParams ,Link, useNavigate} from 'react-router-dom'
+import {UserContext} from "../context/UserContext"
+import { format } from "date-fns";
+const baseURL = import.meta.env.VITE_BASE_URL;
 
 const PostPage = () => {
+  const [postInfo , setPostInfo] = useState(null)
+  const {userInfo}  = useContext(UserContext)
+  const {id} = useParams()
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const navigate = useNavigate();
+
+
+
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(`${URL}/post/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+  
+      if (response.ok) {
+        console.log("Post deleted successfully!");
+        navigate("/");
+      } else {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error("Error deleting post:", error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetch(`${baseURL}/post/${id}`).then((response) => {
+      response.json().then((postInfo) => {
+        setPostInfo(postInfo);
+      });
+    });
+
+  }, [id]);
+  if(!postInfo) return "";
+
+  
   return (
     <div className="post-page">
       <h1>
-      Blog
+      {postInfo.title}
       </h1>
-      <time>12 de 2023 - 18:12</time>
-      <div className="author">Bowornlak</div>
-      <div className="image">
-      <img src="https://talkatalka.com/wp-content/uploads/2023/01/Content05-02.jpg" alt="" />
+      <time>{format(new Date(postInfo.createdAt),"dd MM yyyy HH:MM")}</time>
+      <div className="author">
+        By: {postInfo.author.username}
       </div>
-      <div className="content">
-      <p className="summary">
-          Blog - ทุกวันนี้การเป็นที่รู้จักทางออนไลน์อาจเป็นเรื่องที่ท้าทาย ด้วยพื้นที่ในโลกดิจิทัลนั้นมีการแข่งขันสูงมากขึ้นในแต่ละวัน 
-          ทั้งในเสิร์ชเอ็นจิ้นและบนโซเชียลมีเดีย ดังนั้น ในการดึงดูดผู้ชมมายังเว็บไซต์ของคุณ
-           คุณต้องหาวิธีที่จะทำให้ธุรกิจของคุณโดดเด่นและสามารถส่งมอบคุณค่าให้แก่ผู้ติดตาม และนี่เองที่ทำให้การสร้างบล็อก
-            ถือเป็นส่วนสำคัญที่ทุกธุรกิจไม่ควรมองข้าม แน่นอนว่านี่ไม่ใช่แนวคิดใหม่ อย่างไรก็ตาม ถ้าคุณยังไม่มีบล็อกบนเว็บไซต์ของคุณ 
-            แสดงว่าคุณกำลังพลาดโอกาสครั้งใหญ่ในการดึงดูดลูกค้าเป้าหมายและเพิ่มคอนเวอร์ชั่นให้แก่ธุรกิจของคุณไปหนึ่งเรื่องแล้วครับ
-        </p>
+      {userInfo?.id === postInfo.author._id && (
+        <div className="edit-row">
+          <Link className="edit-btn" to={`/edit/${postInfo._id}`}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
+              />
+            </svg>
+            Edit
+          </Link>
+          <Link
+            className="delete-btn"
+            to="#"
+            onClick={() => setShowDeleteConfirmation(true)}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
+              />
+            </svg>
+            Delete This post
+          </Link>
+          {showDeleteConfirmation && (
+            <div className="delete-confirmation">
+              <p>Are you sure you want to delete this post?</p>
+              <button onClick={() => handleDelete()}>Yes, Delete</button>
+              <button onClick={() => setShowDeleteConfirmation(false)}>Cancel</button>
+            </div>
+          )}
+        </div>
+        
+      )}
+      
+      <div className="image">
+      <img src={`${baseURL}/${postInfo.cover}`} alt="" />
+      </div>
+      <div className="content" dangerouslySetInnerHTML={{__html:postInfo.content}}>
+        
       </div>
     </div>
   )
